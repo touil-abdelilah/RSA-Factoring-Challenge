@@ -2,26 +2,25 @@
 
 import sys
 import math
-import gmpy2
 
 
-def pollards_rho(n):
-    if n % 2 == 0:
-        return 2
-    x = y = 2
-    d = 1
-    f = lambda x: (x**2 + 1) % n
-    while d == 1:
-        x = f(x)
-        y = f(f(y))
-        d = math.gcd(abs(x - y), n)
-    return d
+def trial_division(n):
+    factors = []
+    for i in range(2, int(math.sqrt(n)) + 1):
+        while n % i == 0:
+            factors.append(i)
+            n //= i
+    if n > 1:
+        factors.append(n)
+    return factors
 
 
 def factorize(n):
-    p = pollards_rho(n)
-    q = n // p
-    return p, q
+    factors = trial_division(n)
+    if len(factors) == 2:
+        return factors[0], factors[1]
+    else:
+        return None, None
 
 
 def factorize_file(file_path):
@@ -31,7 +30,10 @@ def factorize_file(file_path):
             if line:
                 number = int(line)
                 p, q = factorize(number)
-                print(f"{number}={p}*{q}")
+                if p is not None and q is not None:
+                    print(f"{number}={p}*{q}")
+                else:
+                    print(f"Unable to factorize {number}")
 
 
 def main():
